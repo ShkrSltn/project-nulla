@@ -5,47 +5,64 @@ export default function Hero() {
   return (
     <section className={styles.hero}>
       <div className={styles.container}>
-        {/* News badge */}
+        {/* Status badge */}
         <div className={styles.badge}>
-          <span className={styles.badgeText}>✨ AI-Powered Job Application Manager</span>
+          <div className={styles.badgeIcon}>✨</div>
+          <span className={styles.badgeText}>AI-Powered Job Application Manager</span>
         </div>
         
-        {/* Main title */}
+        {/* Main heading */}
         <h1 className={styles.title}>
-          Manage Your Job Applications 
-          <span className={styles.highlight}> Smarter</span>
+          Transform Your Job Search with
+          <span className={styles.highlight}> Smart Organization</span>
         </h1>
         
         {/* Subtitle */}
         <p className={styles.subtitle}>
-          Track applications, generate AI-powered cover letters, and organize your job search 
-          in one powerful dashboard. Land your dream job faster.
+          Stop losing track of applications. Our intelligent platform helps you manage, 
+          track, and optimize your job search process with powerful tools and insights.
         </p>
         
-        {/* Action buttons */}
+        {/* CTA buttons */}
         <div className={styles.actions}>
           <Link href="/auth/register" className={styles.primaryBtn}>
-            Get Started Free
-            <svg className={styles.arrow} viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+            <span>Start Free Trial</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="m9 18 6-6-6-6"/>
             </svg>
           </Link>
           
-          <Link href="/auth/login" className={styles.secondaryBtn}>
-            Sign In
-          </Link>
-          
-          <Link href="/admin" className={styles.dashboardBtn}>
-            Admin Panel
-            <svg className={styles.arrow} viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" clipRule="evenodd" />
+          <Link href="/admin" className={styles.secondaryBtn}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
             </svg>
+            <span>Try Demo</span>
           </Link>
         </div>
+
+        {/* Trust indicators */}
+        <div className={styles.trustSection}>
+          <p className={styles.trustText}>Trusted by job seekers worldwide</p>
+          <div className={styles.trustStats}>
+            <div className={styles.trustStat}>
+              <div className={styles.trustNumber}>10K+</div>
+              <div className={styles.trustLabel}>Applications Tracked</div>
+            </div>
+            <div className={styles.trustStat}>
+              <div className={styles.trustNumber}>95%</div>
+              <div className={styles.trustLabel}>Success Rate</div>
+            </div>
+            <div className={styles.trustStat}>
+              <div className={styles.trustNumber}>24/7</div>
+              <div className={styles.trustLabel}>Support</div>
+            </div>
+          </div>
+        </div>
       </div>
-      
-      {/* Background animation */}
-      <div className={styles.backgroundPattern}></div>
+
+      {/* Background elements */}
+      <div className={styles.backgroundGrid}></div>
+      <div className={styles.gradientBlur}></div>
     </section>
   );
 } 
