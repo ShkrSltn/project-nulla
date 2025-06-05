@@ -13,9 +13,14 @@ interface AuthProviderProps {
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
+  // Начинаем с true чтобы избежать проблем гидратации
   const [isLoading, setIsLoading] = useState(true);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
+    // Предотвращаем выполнение на сервере
+    if (typeof window === 'undefined') return;
+    
     // Восстанавливаем состояние аутентификации при загрузке приложения
     const initializeAuth = async () => {
       try {
@@ -23,24 +28,24 @@ export function AuthProvider({ children }: AuthProviderProps) {
         const savedUser = AuthService.getUser();
 
         if (savedToken && savedUser) {
-          // Проверяем валидность токена, запросив текущего пользователя
+          // Сначала устанавливаем данные из localStorage
+          setToken(savedToken);
+          setUser(savedUser);
+          
+          // Затем в фоне проверяем валидность токена (без блокирования UI)
           try {
             const authService = new AuthService();
             const currentUser = await authService.getCurrentUser(savedToken);
             
-            // Проверяем что у пользователя есть минимум необходимых полей
+            // Обновляем данные пользователя если они изменились
             if (currentUser && typeof currentUser.id !== 'undefined') {
-              setToken(savedToken);
               setUser(currentUser);
-            } else {
-              // Неполные данные пользователя, сбрасываем авторизацию
-              AuthService.removeToken();
-              AuthService.removeUser();
+              AuthService.saveUser(currentUser);
             }
           } catch (error) {
-            // Токен невалидный, очищаем данные
-            AuthService.removeToken();
-            AuthService.removeUser();
+            console.warn('Token validation failed, but keeping user logged in:', error);
+            // НЕ делаем logout при ошибке проверки токена
+            // Пользователь останется авторизованным до следующего действия
           }
         } else {
           // Нет токена или данных пользователя
@@ -49,15 +54,25 @@ export function AuthProvider({ children }: AuthProviderProps) {
         }
       } catch (error) {
         console.error('Failed to initialize auth:', error);
-        // В случае ошибки сбрасываем авторизацию
-        setUser(null);
-        setToken(null);
+        // При ошибке инициализации НЕ сбрасываем авторизацию
+        // Пытаемся восстановить из localStorage
+        const savedToken = AuthService.getToken();
+        const savedUser = AuthService.getUser();
+        
+        if (savedToken && savedUser) {
+          setToken(savedToken);
+          setUser(savedUser);
+        }
       } finally {
         setIsLoading(false);
+        setIsInitialized(true);
       }
     };
 
-    initializeAuth();
+    // Небольшая задержка для избежания проблем гидратации
+    const timer = setTimeout(initializeAuth, 50);
+    
+    return () => clearTimeout(timer);
   }, []);
 
   const login = async (email: string, password: string) => {
@@ -74,7 +89,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setToken(response.access_token);
       setUser(response.user);
       
-      // Сохраняем в localStorage
+      // Сохраняем в localStorage и cookies
       AuthService.saveToken(response.access_token);
       AuthService.saveUser(response.user);
     } catch (error) {
@@ -115,6 +130,34 @@ export function AuthProvider({ children }: AuthProviderProps) {
     isLoading,
   };
 
+  // Не рендерим children пока не инициализировались
+  if (!isInitialized) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        minHeight: '100vh',
+        background: '#f8fafc' 
+      }}>
+        <div style={{
+          width: '2rem',
+          height: '2rem',
+          border: '3px solid #e2e8f0',
+          borderTop: '3px solid #667eea',
+          borderRadius: '50%',
+          animation: 'spin 1s linear infinite'
+        }} />
+        <style jsx>{`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
+      </div>
+    );
+  }
+
   return (
     <AuthContext.Provider value={value}>
       {children}
@@ -128,4 +171,4 @@ export function useAuth(): AuthContextType {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
-} 
+}

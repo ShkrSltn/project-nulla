@@ -21,8 +21,17 @@ export default function ProtectedRoute({
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isRedirecting, setIsRedirecting] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Обеспечиваем что компонент смонтирован на клиенте
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
+    // Ждем пока компонент смонтируется и не идет загрузка
+    if (!isMounted || isLoading) return;
+    
     // Создаем URL для редиректа с сохранением текущего пути
     const handleRedirect = (redirectPath: string) => {
       // Избегаем циклического редиректа
@@ -40,29 +49,32 @@ export default function ProtectedRoute({
       }
     };
 
-    if (!isLoading) {
-      // Проверка авторизации
-      if (requireAuth && !user) {
-        handleRedirect(redirectTo);
-        return;
-      }
-
-      // Проверка прав администратора
-      if (requireAdmin && (!user || user.role !== 'admin')) {
-        // Если пользователь не авторизован, отправляем на логин
-        // Если авторизован но не админ, отправляем на страницу с ошибкой доступа
-        const redirectPath = !user ? redirectTo : '/unauthorized';
-        handleRedirect(redirectPath);
-        return;
-      }
-      
-      // Проверяем, нужно ли сделать редирект после успешной авторизации
-      const redirectParam = searchParams.get('redirect');
-      if (user && redirectParam) {
-        router.push(decodeURIComponent(redirectParam));
-      }
+    // Проверка авторизации
+    if (requireAuth && !user) {
+      handleRedirect(redirectTo);
+      return;
     }
-  }, [user, isLoading, requireAuth, requireAdmin, redirectTo, router, searchParams, isRedirecting]);
+
+    // Проверка прав администратора
+    if (requireAdmin && (!user || user.role !== 'admin')) {
+      // Если пользователь не авторизован, отправляем на логин
+      // Если авторизован но не админ, отправляем на страницу с ошибкой доступа
+      const redirectPath = !user ? redirectTo : '/unauthorized';
+      handleRedirect(redirectPath);
+      return;
+    }
+    
+    // Проверяем, нужно ли сделать редирект после успешной авторизации
+    const redirectParam = searchParams.get('redirect');
+    if (user && redirectParam) {
+      router.push(decodeURIComponent(redirectParam));
+    }
+  }, [user, isLoading, requireAuth, requireAdmin, redirectTo, router, searchParams, isRedirecting, isMounted]);
+
+  // Не показываем ничего пока не смонтировались на клиенте
+  if (!isMounted) {
+    return null;
+  }
 
   // Show loading while checking authentication
   if (isLoading) {
@@ -109,4 +121,4 @@ export default function ProtectedRoute({
   }
 
   return <>{children}</>;
-} 
+}

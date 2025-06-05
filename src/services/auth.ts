@@ -56,31 +56,41 @@ class AuthService {
 
   // Utility methods for token management
   static saveToken(token: string): void {
-    // Сохраняем в localStorage для доступа из JS
+    // Сохраняем в localStorage для доступа из JS только на клиенте
     if (typeof window !== 'undefined') {
-      localStorage.setItem('auth_token', token);
-      
-      // Также сохраняем в cookie для доступа на сервере (middleware)
       try {
-        Cookies.set('auth_token', token, { expires: COOKIE_EXPIRES, path: '/' });
+        localStorage.setItem('auth_token', token);
+        
+        // Также сохраняем в cookie для доступа на сервере (middleware)
+        Cookies.set('auth_token', token, { 
+          expires: COOKIE_EXPIRES, 
+          path: '/',
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'strict'
+        });
       } catch (error) {
-        console.error('Failed to set cookie:', error);
+        console.error('Failed to save token:', error);
       }
     }
   }
 
   static getToken(): string | null {
     if (typeof window !== 'undefined') {
-      // Сначала проверяем localStorage
-      const token = localStorage.getItem('auth_token');
-      if (token) return token;
-      
-      // Если нет в localStorage, проверяем cookie
       try {
+        // Сначала проверяем localStorage (приоритет)
+        const token = localStorage.getItem('auth_token');
+        if (token) return token;
+        
+        // Если нет в localStorage, проверяем cookie
         const cookieToken = Cookies.get('auth_token');
-        return cookieToken || null;
+        if (cookieToken) {
+          // Восстанавливаем в localStorage если найден в cookie
+          localStorage.setItem('auth_token', cookieToken);
+          return cookieToken;
+        }
       } catch (error) {
-        console.error('Failed to get cookie:', error);
+        console.error('Failed to get token:', error);
+        return null;
       }
     }
     return null;
@@ -88,34 +98,47 @@ class AuthService {
 
   static removeToken(): void {
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('auth_token');
-      
-      // Удаляем и из cookie
       try {
+        localStorage.removeItem('auth_token');
         Cookies.remove('auth_token', { path: '/' });
+        // Также пытаемся удалить из всех путей
+        Cookies.remove('auth_token');
       } catch (error) {
-        console.error('Failed to remove cookie:', error);
+        console.error('Failed to remove token:', error);
       }
     }
   }
 
   static saveUser(user: User): void {
     if (typeof window !== 'undefined') {
-      localStorage.setItem('auth_user', JSON.stringify(user));
+      try {
+        localStorage.setItem('auth_user', JSON.stringify(user));
+      } catch (error) {
+        console.error('Failed to save user:', error);
+      }
     }
   }
 
   static getUser(): User | null {
     if (typeof window !== 'undefined') {
-      const userStr = localStorage.getItem('auth_user');
-      return userStr ? JSON.parse(userStr) : null;
+      try {
+        const userStr = localStorage.getItem('auth_user');
+        return userStr ? JSON.parse(userStr) : null;
+      } catch (error) {
+        console.error('Failed to get user:', error);
+        return null;
+      }
     }
     return null;
   }
 
   static removeUser(): void {
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('auth_user');
+      try {
+        localStorage.removeItem('auth_user');
+      } catch (error) {
+        console.error('Failed to remove user:', error);
+      }
     }
   }
 }
