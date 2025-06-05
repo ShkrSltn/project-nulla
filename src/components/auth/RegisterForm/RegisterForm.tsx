@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
-import styles from '../LoginForm/LoginForm.module.css'; // Используем те же стили
+import styles from '../LoginForm/LoginForm.module.css'; // Using the same styles
 
 interface FormData {
   email: string;
@@ -87,7 +87,7 @@ export default function RegisterForm() {
 
     try {
       await register(formData.email, formData.password);
-      router.push('/admin'); // Перенаправляем в админ панель после успешной регистрации
+      router.push('/admin'); // Redirect to admin panel after successful registration
     } catch (error) {
       setErrors({
         general: error instanceof Error ? error.message : 'Registration failed. Please try again.',

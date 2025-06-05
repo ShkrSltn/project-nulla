@@ -2,7 +2,7 @@ import { LoginRequest, RegisterRequest, AuthResponse, User } from '@/types/auth'
 import Cookies from 'js-cookie';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-const COOKIE_EXPIRES = 7; // 7 дней
+const COOKIE_EXPIRES = 7; // 7 days
 
 class AuthService {
   async login(credentials: LoginRequest): Promise<AuthResponse> {
@@ -56,12 +56,12 @@ class AuthService {
 
   // Utility methods for token management
   static saveToken(token: string): void {
-    // Сохраняем в localStorage для доступа из JS только на клиенте
+    // Save to localStorage for JS access only on client side
     if (typeof window !== 'undefined') {
       try {
         localStorage.setItem('auth_token', token);
         
-        // Также сохраняем в cookie для доступа на сервере (middleware)
+        // Also save to cookie for server access (middleware)
         Cookies.set('auth_token', token, { 
           expires: COOKIE_EXPIRES, 
           path: '/',
@@ -77,14 +77,14 @@ class AuthService {
   static getToken(): string | null {
     if (typeof window !== 'undefined') {
       try {
-        // Сначала проверяем localStorage (приоритет)
+        // First check localStorage (priority)
         const token = localStorage.getItem('auth_token');
         if (token) return token;
         
-        // Если нет в localStorage, проверяем cookie
+        // If not in localStorage, check cookie
         const cookieToken = Cookies.get('auth_token');
         if (cookieToken) {
-          // Восстанавливаем в localStorage если найден в cookie
+          // Restore to localStorage if found in cookie
           localStorage.setItem('auth_token', cookieToken);
           return cookieToken;
         }
@@ -101,7 +101,7 @@ class AuthService {
       try {
         localStorage.removeItem('auth_token');
         Cookies.remove('auth_token', { path: '/' });
-        // Также пытаемся удалить из всех путей
+        // Also try to remove from all paths
         Cookies.remove('auth_token');
       } catch (error) {
         console.error('Failed to remove token:', error);

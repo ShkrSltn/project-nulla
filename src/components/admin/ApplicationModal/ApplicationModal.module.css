@@ -4,31 +4,29 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.5);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1000;
     padding: 1rem;
-    overflow-y: auto;
 }
 
 .modal {
     background: white;
-    border-radius: 16px;
-    max-width: 800px;
+    border-radius: 12px;
     width: 100%;
+    max-width: 800px;
     max-height: 90vh;
     overflow-y: auto;
-    position: relative;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 2rem 2rem 1rem;
+    padding: 1.5rem;
     border-bottom: 1px solid #e2e8f0;
 }
 
@@ -42,82 +40,86 @@
 .closeButton {
     background: none;
     border: none;
-    color: #64748b;
-    cursor: pointer;
     padding: 0.5rem;
-    border-radius: 8px;
+    cursor: pointer;
+    color: #64748b;
+    border-radius: 6px;
     transition: all 0.2s ease;
 }
 
 .closeButton:hover {
     background: #f1f5f9;
-    color: #334155;
+    color: #1e293b;
 }
 
 .form {
-    padding: 2rem;
+    padding: 1.5rem;
 }
 
 .grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 1.5rem;
+    gap: 1rem;
+    margin-bottom: 1rem;
 }
 
 .field {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+}
+
+.fieldCheckbox {
+    display: flex;
+    align-items: center;
+    margin-top: 1rem;
 }
 
 .label {
-    font-size: 0.875rem;
     font-weight: 600;
     color: #374151;
-}
-
-.input {
-    padding: 0.75rem 1rem;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
+    margin-bottom: 0.5rem;
     font-size: 0.875rem;
-    transition: all 0.2s ease;
-    background: white;
-    color: #1e293b;
 }
 
-.input:focus {
+.input,
+.select {
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    transition: border-color 0.2s ease;
+}
+
+.input:focus,
+.select:focus {
     outline: none;
     border-color: #667eea;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
-.input.error {
+.error {
     border-color: #ef4444;
 }
 
 .errorText {
     color: #ef4444;
     font-size: 0.75rem;
+    margin-top: 0.25rem;
 }
 
 .checkboxLabel {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    cursor: pointer;
     font-size: 0.875rem;
     color: #374151;
-    cursor: pointer;
 }
 
 .checkbox {
-    width: 1rem;
-    height: 1rem;
-    accent-color: #667eea;
+    margin-right: 0.5rem;
 }
 
-.tagInput {
+.inputGroup {
     display: flex;
     gap: 0.5rem;
 }
@@ -126,11 +128,10 @@
     background: #667eea;
     color: white;
     border: none;
-    border-radius: 8px;
     padding: 0.75rem 1rem;
-    font-size: 0.875rem;
-    font-weight: 500;
+    border-radius: 6px;
     cursor: pointer;
+    font-size: 0.875rem;
     transition: background 0.2s ease;
     white-space: nowrap;
 }
@@ -147,42 +148,39 @@
 }
 
 .tag {
-    background: #f1f5f9;
-    color: #475569;
-    padding: 0.25rem 0.75rem;
-    border-radius: 16px;
+    background: #e0e7ff;
+    color: #3730a3;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
     font-size: 0.75rem;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.25rem;
 }
 
-.removeTag {
+.tagRemove {
     background: none;
     border: none;
-    color: #64748b;
+    color: #3730a3;
     cursor: pointer;
     font-size: 1rem;
-    line-height: 1;
     padding: 0;
-    width: 1rem;
-    height: 1rem;
+    width: 16px;
+    height: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
-    transition: all 0.2s ease;
+    border-radius: 2px;
 }
 
-.removeTag:hover {
-    background: #e2e8f0;
-    color: #374151;
+.tagRemove:hover {
+    background: rgba(55, 48, 163, 0.1);
 }
 
 .actions {
     display: flex;
-    gap: 1rem;
     justify-content: flex-end;
+    gap: 0.75rem;
     margin-top: 2rem;
     padding-top: 1.5rem;
     border-top: 1px solid #e2e8f0;
@@ -190,83 +188,59 @@
 
 .cancelButton {
     background: white;
-    color: #64748b;
+    color: #6b7280;
     border: 1px solid #d1d5db;
-    border-radius: 8px;
     padding: 0.75rem 1.5rem;
-    font-size: 0.875rem;
-    font-weight: 500;
+    border-radius: 6px;
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
-.cancelButton:hover:not(:disabled) {
-    background: #f8fafc;
-    border-color: #94a3b8;
+.cancelButton:hover {
+    background: #f9fafb;
 }
 
 .submitButton {
     background: #667eea;
     color: white;
     border: none;
-    border-radius: 8px;
     padding: 0.75rem 1.5rem;
-    font-size: 0.875rem;
-    font-weight: 600;
+    border-radius: 6px;
     cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+    transition: background 0.2s ease;
 }
 
-.submitButton:hover:not(:disabled) {
+.submitButton:hover {
     background: #5a67d8;
 }
 
-.submitButton:disabled {
-    opacity: 0.6;
+.submitButton:disabled,
+.cancelButton:disabled {
+    opacity: 0.5;
     cursor: not-allowed;
-}
-
-.spinner {
-    width: 1rem;
-    height: 1rem;
-    border: 2px solid transparent;
-    border-top: 2px solid currentColor;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
 }
 
 @media (max-width: 768px) {
     .modal {
-        margin: 1rem;
-        max-height: calc(100vh - 2rem);
-    }
-
-    .header,
-    .form {
-        padding: 1.5rem;
+        margin: 0;
+        border-radius: 0;
+        max-height: 100vh;
     }
 
     .grid {
         grid-template-columns: 1fr;
-        gap: 1rem;
     }
 
     .actions {
         flex-direction: column;
     }
+}
 
-    .cancelButton,
-    .submitButton {
-        width: 100%;
-        justify-content: center;
-    }
+.uploadedFiles {
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background: #f8f9fa;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    color: #6c757d;
 }

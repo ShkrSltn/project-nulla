@@ -1,0 +1,44 @@
+.filesList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    max-width: 200px;
+}
+
+.fileButton {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    text-align: left;
+    transition: all 0.2s ease;
+    color: #495057;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.fileButton:hover {
+    background: #e9ecef;
+    border-color: #6c757d;
+}
+
+.fileButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.loading {
+    margin-left: auto;
+}
+
+.noFiles {
+    color: #6c757d;
+    font-style: italic;
+    font-size: 0.875rem;
+}

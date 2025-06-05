@@ -5,24 +5,24 @@ export default function Hero() {
   return (
     <section className={styles.hero}>
       <div className={styles.container}>
-        {/* Бейдж с новостью */}
+        {/* News badge */}
         <div className={styles.badge}>
           <span className={styles.badgeText}>✨ AI-Powered Job Application Manager</span>
         </div>
         
-        {/* Главный заголовок */}
+        {/* Main title */}
         <h1 className={styles.title}>
           Manage Your Job Applications 
           <span className={styles.highlight}> Smarter</span>
         </h1>
         
-        {/* Подзаголовок */}
+        {/* Subtitle */}
         <p className={styles.subtitle}>
           Track applications, generate AI-powered cover letters, and organize your job search 
           in one powerful dashboard. Land your dream job faster.
         </p>
         
-        {/* Кнопки действий */}
+        {/* Action buttons */}
         <div className={styles.actions}>
           <Link href="/auth/register" className={styles.primaryBtn}>
             Get Started Free
@@ -44,7 +44,7 @@ export default function Hero() {
         </div>
       </div>
       
-      {/* Фоновая анимация */}
+      {/* Background animation */}
       <div className={styles.backgroundPattern}></div>
     </section>
   );

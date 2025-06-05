@@ -1,0 +1,134 @@
+.fileUpload {
+    width: 100%;
+    margin: 1rem 0;
+}
+
+.dropZone {
+    border: 2px dashed #e2e8f0;
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #fafbfc;
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dropZone:hover {
+    border-color: #667eea;
+    background: #f8f9ff;
+}
+
+.dragActive {
+    border-color: #667eea;
+    background: #f0f2ff;
+    transform: scale(1.02);
+}
+
+.fileInput {
+    display: none;
+}
+
+.dropContent {
+    pointer-events: none;
+}
+
+.uploadIcon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.dropText {
+    font-size: 1rem;
+    color: #4a5568;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.fileTypes {
+    font-size: 0.875rem;
+    color: #718096;
+}
+
+.fileList {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.fileList h4 {
+    margin: 0 0 0.75rem 0;
+    color: #2d3748;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.fileItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.fileItem:last-child {
+    border-bottom: none;
+}
+
+.fileInfo {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.fileName {
+    font-size: 0.875rem;
+    color: #2d3748;
+    font-weight: 500;
+}
+
+.fileSize {
+    font-size: 0.75rem;
+    color: #718096;
+    margin-top: 0.125rem;
+}
+
+.removeButton {
+    background: #fed7d7;
+    color: #c53030;
+    border: none;
+    border-radius: 4px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.75rem;
+    transition: all 0.2s ease;
+}
+
+.removeButton:hover {
+    background: #fbb6b6;
+    transform: scale(1.1);
+}
+
+@media (max-width: 768px) {
+    .dropZone {
+        padding: 1.5rem 1rem;
+        min-height: 100px;
+    }
+
+    .dropText {
+        font-size: 0.9rem;
+    }
+
+    .fileTypes {
+        font-size: 0.8rem;
+    }
+}
