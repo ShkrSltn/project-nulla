@@ -13,7 +13,7 @@ export default function CTA() {
             <button className={styles.primaryBtn}>Start Free Trial</button>
             <button className={styles.secondaryBtn}>Schedule Demo</button>
           </div>
-          <p className={styles.note}>No credit card required • 14-day free trial</p>
+          <p className={styles.note}>No credit card required • 7-day free trial</p>
         </div>
       </div>
     </section>
