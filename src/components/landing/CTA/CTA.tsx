@@ -1,4 +1,5 @@
 import styles from './CTA.module.css';
+import Link from 'next/link';
 
 export default function CTA() {
   return (
@@ -7,13 +8,13 @@ export default function CTA() {
         <div className={styles.content}>
           <h2 className={styles.title}>Ready to transform your job search?</h2>
           <p className={styles.subtitle}>
-            Join thousands of job seekers who have streamlined their application process and landed their dream jobs.
+            Get started with our powerful job application management tools.
           </p>
           <div className={styles.actions}>
-            <button className={styles.primaryBtn}>Start Free Trial</button>
-            <button className={styles.secondaryBtn}>Schedule Demo</button>
+            <Link href="/admin" className={styles.primaryBtn}>
+              Get Started
+            </Link>
           </div>
-          <p className={styles.note}>No credit card required • 7-day free trial</p>
         </div>
       </div>
     </section>

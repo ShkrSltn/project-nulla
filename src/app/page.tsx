@@ -1,13 +1,5 @@
-import Hero from '@/components/Hero';
-import Features from '@/components/Features';
-import CTA from '@/components/CTA';
+import { redirect } from 'next/navigation';
 
-export default function Home() {
-  return (
-    <main>
-      <Hero />
-      <Features />
-      <CTA />
-    </main>
-  );
-}
+export default function RootPage() {
+  redirect('/landing');
+} 

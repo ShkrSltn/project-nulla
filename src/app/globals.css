@@ -1,14 +1,23 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --primary-color: #667eea;
+  --primary-hover: #5a67d8;
+  --background-light: #f8fafc;
+  --background-dark: #1e293b;
 }
 
+/* Временно отключаем автоматическое определение темной темы */
+/*
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
   }
 }
+*/
 
 * {
   box-sizing: border-box;
@@ -54,8 +63,29 @@ html {
   color: white;
 }
 
+/* Отключаем автоматическую темную тему */
+/*
 @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;
   }
+}
+*/
+
+/* Utilities */
+.text-light {
+  color: var(--foreground) !important;
+}
+
+.text-dark {
+  color: var(--text-primary) !important;
+}
+
+.bg-light {
+  background-color: var(--background) !important;
+}
+
+.bg-dark {
+  background-color: var(--background-dark) !important;
+  color: white !important;
 }
