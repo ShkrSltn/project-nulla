@@ -95,7 +95,7 @@ export default function ApplicationsTable() {
 
     try {
       await applicationService.deleteApplication(id);
-      await loadApplications(); // Reload data
+      await loadApplications();
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Failed to delete application');
     }
@@ -111,10 +111,10 @@ export default function ApplicationsTable() {
         await applicationService.createApplication(data);
       }
       
-      await loadApplications(); // Reload data
+      await loadApplications();
       setIsModalOpen(false);
     } catch (err) {
-      throw err; // Let modal handle the error
+      throw err;
     } finally {
       setModalLoading(false);
     }
@@ -131,33 +131,18 @@ export default function ApplicationsTable() {
 
   const formatUrl = (url: string) => {
     if (!url) return '';
-    // Remove protocol for display
     return url.replace(/^https?:\/\//, '');
   };
 
   if (error) {
     return (
       <div className={styles.container}>
-        <div style={{ 
-          background: 'white', 
-          padding: '2rem', 
-          borderRadius: '12px', 
-          textAlign: 'center',
-          color: '#ef4444'
-        }}>
-          <h2>Error loading applications</h2>
-          <p>{error}</p>
+        <div className={styles.errorContainer}>
+          <h2 className={styles.errorTitle}>Error loading applications</h2>
+          <p className={styles.errorText}>{error}</p>
           <button 
             onClick={loadApplications}
-            style={{
-              background: '#667eea',
-              color: 'white',
-              border: 'none',
-              padding: '0.75rem 1.5rem',
-              borderRadius: '8px',
-              marginTop: '1rem',
-              cursor: 'pointer'
-            }}
+            className={styles.retryButton}
           >
             Try Again
           </button>
@@ -211,29 +196,17 @@ export default function ApplicationsTable() {
         </div>
 
         <button onClick={handleAddApplication} className={styles.addButton}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2v20M2 12h20" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
           </svg>
           Add Application
         </button>
       </div>
 
       {loading ? (
-        <div style={{ 
-          background: 'white', 
-          padding: '3rem', 
-          borderRadius: '12px', 
-          textAlign: 'center' 
-        }}>
-          <div style={{
-            width: '2rem',
-            height: '2rem',
-            border: '3px solid #e2e8f0',
-            borderTop: '3px solid #667eea',
-            borderRadius: '50%',
-            animation: 'spin 1s linear infinite',
-            margin: '0 auto 1rem'
-          }} />
+        <div className={styles.loadingContainer}>
+          <div className={styles.loadingSpinner} />
           <p>Loading applications...</p>
         </div>
       ) : (
@@ -243,19 +216,19 @@ export default function ApplicationsTable() {
               <thead className={styles.tableHeader}>
                 <tr>
                   <th>Company</th>
-                  <th>Position + Level</th>
-                  <th>City</th>
+                  <th>Position</th>
+                  <th>Location</th>
                   <th>Company Size</th>
                   <th>Type</th>
-                  <th>Stage</th>
-                  <th>Referral?</th>
+                  <th>Status</th>
+                  <th>Referral</th>
                   <th>Contact</th>
-                  <th>Apply Date</th>
-                  <th>Response Date</th>
-                  <th>Salary Range</th>
+                  <th>Applied</th>
+                  <th>Response</th>
+                  <th>Salary</th>
                   <th>Files</th>
-                  <th>Posting URL</th>
-                  <th>Language</th>
+                  <th>Posting</th>
+                  <th>Languages</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -271,9 +244,13 @@ export default function ApplicationsTable() {
                       {app.level && <div className={styles.level}>{app.level}</div>}
                     </td>
                     
-                    <td className={styles.tableCell}>{app.city}</td>
+                    <td className={styles.tableCell}>
+                      <span className={styles.contactInfo}>{app.city}</span>
+                    </td>
                     
-                    <td className={styles.tableCell}>{app.company_size}</td>
+                    <td className={styles.tableCell}>
+                      <span className={styles.contactInfo}>{app.company_size}</span>
+                    </td>
                     
                     <td className={styles.tableCell}>
                       <span className={styles.typeBadge}>{app.type}</span>
@@ -296,33 +273,36 @@ export default function ApplicationsTable() {
                     </td>
                     
                     <td className={styles.tableCell}>
-                      <div className={styles.contactInfo}>{app.contact || '-'}</div>
+                      <span className={styles.contactInfo}>{app.contact || '-'}</span>
                     </td>
                     
                     <td className={styles.tableCell}>
-                      <div className={styles.dateInfo}>{formatDate(app.apply_date)}</div>
+                      <span className={styles.dateInfo}>{formatDate(app.apply_date)}</span>
                     </td>
                     
                     <td className={styles.tableCell}>
-                      <div className={styles.dateInfo}>{formatDate(app.response_date)}</div>
+                      <span className={styles.dateInfo}>{formatDate(app.response_date)}</span>
                     </td>
                     
                     <td className={styles.tableCell}>
                       {app.salary_range && (
-                        <div className={styles.salaryRange}>{app.salary_range}</div>
+                        <span className={styles.salaryRange}>{app.salary_range}</span>
                       )}
                     </td>
                     
                     <td className={styles.tableCell}>
                       <div className={styles.filesCell}>
                         {app.files.length > 0 ? (
-                          app.files.map((file, index) => (
+                          app.files.slice(0, 2).map((file, index) => (
                             <span key={index} className={styles.fileLink}>
-                              {file}
+                              📄 {file.split('/').pop()}
                             </span>
                           ))
                         ) : (
-                          <span style={{ color: '#9ca3af', fontSize: '0.75rem' }}>-</span>
+                          <span className={styles.noReferral}>-</span>
+                        )}
+                        {app.files.length > 2 && (
+                          <span className={styles.noReferral}>+{app.files.length - 2}</span>
                         )}
                       </div>
                     </td>
@@ -341,11 +321,14 @@ export default function ApplicationsTable() {
                     
                     <td className={styles.tableCell}>
                       <div className={styles.languageTags}>
-                        {app.languages.map((lang, index) => (
+                        {app.languages.slice(0, 3).map((lang, index) => (
                           <span key={index} className={styles.languageTag}>
                             {lang}
                           </span>
                         ))}
+                        {app.languages.length > 3 && (
+                          <span className={styles.languageTag}>+{app.languages.length - 3}</span>
+                        )}
                       </div>
                     </td>
                     
@@ -356,9 +339,9 @@ export default function ApplicationsTable() {
                           className={styles.actionButton}
                           title="Edit"
                         >
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                            <path d="m18.5 2.5 a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="m18 2 4 4-12 12H6v-4z"/>
+                            <path d="m21.5 6.5-4-4"/>
                           </svg>
                         </button>
                         <button 
@@ -366,9 +349,11 @@ export default function ApplicationsTable() {
                           className={styles.actionButton}
                           title="Delete"
                         >
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                             <polyline points="3,6 5,6 21,6"/>
-                            <path d="m19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"/>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                            <line x1="10" y1="11" x2="10" y2="17"/>
+                            <line x1="14" y1="11" x2="14" y2="17"/>
                           </svg>
                         </button>
                       </div>
@@ -380,20 +365,14 @@ export default function ApplicationsTable() {
           </div>
 
           {filteredApplications.length === 0 && !loading && (
-            <div style={{ 
-              textAlign: 'center', 
-              padding: '3rem', 
-              color: '#64748b',
-              background: 'white',
-              borderRadius: '12px'
-            }}>
-              <p style={{ fontSize: '1.125rem', marginBottom: '0.5rem' }}>
+            <div className={styles.emptyState}>
+              <h3 className={styles.emptyTitle}>
                 {searchTerm || statusFilter !== 'all' || typeFilter !== 'all' 
                   ? 'No applications match your filters' 
                   : 'No applications yet'
                 }
-              </p>
-              <p style={{ fontSize: '0.875rem' }}>
+              </h3>
+              <p className={styles.emptyText}>
                 {searchTerm || statusFilter !== 'all' || typeFilter !== 'all'
                   ? 'Try adjusting your search criteria'
                   : 'Click "Add Application" to get started'
@@ -411,13 +390,6 @@ export default function ApplicationsTable() {
         application={editingApplication}
         isLoading={modalLoading}
       />
-
-      <style jsx>{`
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-      `}</style>
     </div>
   );
 } 

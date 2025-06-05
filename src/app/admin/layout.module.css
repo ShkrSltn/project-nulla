@@ -1,6 +1,7 @@
 .dashboardLayout {
     display: flex;
     min-height: 100vh;
+    background: #f8fafc;
 }
 
 .dashboardMain {

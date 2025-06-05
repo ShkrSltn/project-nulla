@@ -26,30 +26,37 @@ export default function Sidebar() {
 
   const navigationSections: NavSection[] = [
     {
-      title: 'Overview',
+      title: 'Dashboard',
       items: [
         {
           id: 'admin',
-          label: 'Admin Panel',
+          label: 'Overview',
           href: '/admin',
           icon: (
-            <svg viewBox="0 0 20 20" fill="currentColor" className={styles.navIcon}>
-              <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="3" y="3" width="7" height="7"/>
+              <rect x="14" y="3" width="7" height="7"/>
+              <rect x="14" y="14" width="7" height="7"/>
+              <rect x="3" y="14" width="7" height="7"/>
             </svg>
           ),
         },
       ],
     },
     {
-      title: 'Job Applications',
+      title: 'Management',
       items: [
         {
           id: 'applications',
-          label: 'All Applications',
+          label: 'Applications',
           href: '/admin/applications',
           icon: (
-            <svg viewBox="0 0 20 20" fill="currentColor" className={styles.navIcon}>
-              <path fillRule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-2a1 1 0 00-1-1H9a1 1 0 00-1 1v2a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z" clipRule="evenodd" />
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14,2 14,8 20,8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <polyline points="10,9 9,9 8,9"/>
             </svg>
           ),
         },
@@ -78,10 +85,7 @@ export default function Sidebar() {
   };
 
   const getUserInitials = (email?: string): string => {
-    // Безопасно обрабатываем случай, когда email отсутствует
     if (!email) return '?';
-    
-    // Получаем первый символ email или первый символ до @
     const name = email.split('@')[0];
     return name.charAt(0).toUpperCase();
   };
@@ -94,8 +98,10 @@ export default function Sidebar() {
         onClick={toggleSidebar}
         aria-label="Toggle sidebar"
       >
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
         </svg>
       </button>
 
@@ -111,9 +117,9 @@ export default function Sidebar() {
         <div className={styles.header}>
           <Link href="/admin" className={styles.logo}>
             <div className={styles.logoIcon}>
-              ⚙️
+              N
             </div>
-            <span style={{ color: 'white' }}>Nulla.io Admin</span>
+            <span className={styles.logoText}>Nulla.io</span>
           </Link>
         </div>
 
@@ -121,7 +127,7 @@ export default function Sidebar() {
         <nav className={styles.nav}>
           {navigationSections.map((section) => (
             <div key={section.title} className={styles.navSection}>
-              <h3 className={styles.sectionTitle} style={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+              <h3 className={styles.sectionTitle}>
                 {section.title}
               </h3>
               <ul className={styles.navList}>
@@ -133,10 +139,9 @@ export default function Sidebar() {
                         isActiveLink(item.href) ? styles.active : ''
                       }`}
                       onClick={closeSidebar}
-                      style={{ color: 'rgba(255, 255, 255, 0.9)' }}
                     >
-                      {item.icon}
-                      <span>{item.label}</span>
+                      <span className={styles.navIcon}>{item.icon}</span>
+                      <span className={styles.navLabel}>{item.label}</span>
                     </Link>
                   </li>
                 ))}
@@ -153,45 +158,29 @@ export default function Sidebar() {
                 {getUserInitials(user.email)}
               </div>
               <div className={styles.userDetails}>
-                <p className={styles.userName} style={{ color: 'white' }}>
+                <p className={styles.userName}>
                   {user.email ? user.email.split('@')[0] : 'User'}
                 </p>
-                <p className={styles.userEmail} style={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                <p className={styles.userEmail}>
                   {user.email || 'No email'}
                 </p>
-                <div style={{ marginTop: '0.5rem' }}>
-                  <button 
-                    onClick={handleLogout}
-                    style={{
-                      background: 'rgba(255, 255, 255, 0.1)',
-                      color: 'white',
-                      border: '1px solid rgba(255, 255, 255, 0.2)',
-                      borderRadius: '6px',
-                      padding: '0.25rem 0.75rem',
-                      fontSize: '0.75rem',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
-                    }}
-                  >
-                    Logout
-                  </button>
-                </div>
               </div>
+              <button 
+                onClick={handleLogout}
+                className={styles.logoutButton}
+                aria-label="Logout"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                  <polyline points="16 17 21 12 16 7"/>
+                  <line x1="21" y1="12" x2="9" y2="12"/>
+                </svg>
+              </button>
             </div>
           ) : (
-            <div className={styles.userInfo}>
-              <div className={styles.userDetails}>
-                <Link href="/auth/login" style={{ color: 'white', textDecoration: 'none' }}>
-                  Sign In
-                </Link>
-              </div>
-            </div>
+            <Link href="/auth/login" className={styles.loginLink}>
+              Sign In
+            </Link>
           )}
         </div>
       </aside>
