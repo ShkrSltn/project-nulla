@@ -1,10 +1,24 @@
 'use client';
 
 import { useState, useMemo, useEffect, useCallback } from 'react';
+import {
+  useReactTable,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getSortedRowModel,
+  flexRender,
+  createColumnHelper,
+} from '@tanstack/react-table';
 import { Application, ApplicationFilter } from '@/types/applications';
 import ApplicationService from '@/services/applications';
 import ApplicationModal from '@/components/admin/ApplicationModal/ApplicationModal';
+import FilesList from './FilesList';
 import styles from './ApplicationsTable.module.css';
+
+const columnHelper = createColumnHelper<Application>();
+
+// Default column size for consistent width
+const DEFAULT_COLUMN_SIZE = 150;
 
 export default function ApplicationsTable() {
   const [applications, setApplications] = useState<Application[]>([]);
@@ -16,6 +30,7 @@ export default function ApplicationsTable() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingApplication, setEditingApplication] = useState<Application | null>(null);
   const [modalLoading, setModalLoading] = useState(false);
+  const [globalFilter, setGlobalFilter] = useState('');
 
   const applicationService = new ApplicationService();
 
@@ -26,9 +41,6 @@ export default function ApplicationsTable() {
       
       const filters: ApplicationFilter = {};
       
-      if (searchTerm) {
-        filters.company = searchTerm;
-      }
       if (statusFilter !== 'all') {
         filters.stage = statusFilter as any;
       }
@@ -44,13 +56,211 @@ export default function ApplicationsTable() {
     } finally {
       setLoading(false);
     }
-  }, [searchTerm, statusFilter, typeFilter]);
+  }, [statusFilter, typeFilter]);
 
   useEffect(() => {
     loadApplications();
   }, [loadApplications]);
 
-  const filteredApplications = useMemo(() => {
+  const columns = useMemo(
+    () => [
+      columnHelper.accessor('company', {
+        header: 'Company',
+        cell: (info) => (
+          <div className={styles.company}>{info.getValue()}</div>
+        ),
+        size: DEFAULT_COLUMN_SIZE,
+        minSize: 100,
+        maxSize: 300,
+      }),
+      columnHelper.accessor('position', {
+        header: 'Position',
+        cell: (info) => (
+          <div>
+            <div className={styles.position}>{info.getValue()}</div>
+            {info.row.original.level && (
+              <div className={styles.level}>{info.row.original.level}</div>
+            )}
+          </div>
+        ),
+        size: DEFAULT_COLUMN_SIZE,
+        minSize: 120,
+        maxSize: 350,
+      }),
+      columnHelper.accessor('city', {
+        header: 'Location',
+        cell: (info) => (
+          <span className={styles.contactInfo}>{info.getValue()}</span>
+        ),
+        size: DEFAULT_COLUMN_SIZE,
+        minSize: 80,
+        maxSize: 250,
+      }),
+      columnHelper.accessor('company_size', {
+        header: 'Company Size',
+        cell: (info) => (
+          <span className={styles.contactInfo}>{info.getValue()}</span>
+        ),
+        size: DEFAULT_COLUMN_SIZE,
+        minSize: 80,
+        maxSize: 200,
+      }),
+      columnHelper.accessor('type', {
+        header: 'Type',
+        cell: (info) => (
+          <span className={styles.typeBadge}>{info.getValue()}</span>
+        ),
+        size: DEFAULT_COLUMN_SIZE,
+        minSize: 80,
+        maxSize: 180,
+      }),
+      columnHelper.accessor('stage', {
+        header: 'Status',
+        cell: (info) => (
+          <span className={getStatusBadgeClass(info.getValue())}>
+            {info.getValue()}
+          </span>
+        ),
+        size: DEFAULT_COLUMN_SIZE,
+        minSize: 100,
+        maxSize: 200,
+      }),
+      columnHelper.accessor('referral', {
+        header: 'Referral',
+        cell: (info) => (
+          info.getValue() ? (
+            <svg className={styles.referralIcon} viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+            </svg>
+          ) : (
+            <span className={styles.noReferral}>No</span>
+          )
+        ),
+        size: 100,
+        minSize: 60,
+        maxSize: 120,
+      }),
+      columnHelper.accessor('contact', {
+        header: 'Contact',
+        cell: (info) => (
+          <span className={styles.contactInfo}>{info.getValue() || '-'}</span>
+        ),
+        size: DEFAULT_COLUMN_SIZE,
+        minSize: 80,
+        maxSize: 200,
+      }),
+      columnHelper.accessor('apply_date', {
+        header: 'Applied',
+        cell: (info) => (
+          <span className={styles.dateInfo}>{formatDate(info.getValue())}</span>
+        ),
+        size: DEFAULT_COLUMN_SIZE,
+        minSize: 80,
+        maxSize: 180,
+      }),
+      columnHelper.accessor('response_date', {
+        header: 'Response',
+        cell: (info) => (
+          <span className={styles.dateInfo}>{formatDate(info.getValue())}</span>
+        ),
+        size: DEFAULT_COLUMN_SIZE,
+        minSize: 80,
+        maxSize: 180,
+      }),
+      columnHelper.accessor('salary_range', {
+        header: 'Salary',
+        cell: (info) => (
+          info.getValue() ? (
+            <span className={styles.salaryRange}>{info.getValue()}</span>
+          ) : null
+        ),
+        size: DEFAULT_COLUMN_SIZE,
+        minSize: 80,
+        maxSize: 200,
+      }),
+      columnHelper.accessor('files', {
+        header: 'Files',
+        cell: (info) => (
+          <FilesList files={info.getValue()} userId={1} />
+        ),
+        size: DEFAULT_COLUMN_SIZE,
+        minSize: 100,
+        maxSize: 250,
+      }),
+      columnHelper.accessor('posting_url', {
+        header: 'Posting',
+        cell: (info) => (
+          <a 
+            href={info.getValue().startsWith('http') ? info.getValue() : `https://${info.getValue()}`} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className={styles.urlLink}
+            title={info.getValue()}
+          >
+            {formatUrl(info.getValue())}
+          </a>
+        ),
+        size: DEFAULT_COLUMN_SIZE,
+        minSize: 100,
+        maxSize: 250,
+      }),
+      columnHelper.accessor('languages', {
+        header: 'Languages',
+        cell: (info) => (
+          <div className={styles.languageTags}>
+            {info.getValue().slice(0, 3).map((lang, index) => (
+              <span key={index} className={styles.languageTag}>
+                {lang}
+              </span>
+            ))}
+            {info.getValue().length > 3 && (
+              <span className={styles.languageTag}>+{info.getValue().length - 3}</span>
+            )}
+          </div>
+        ),
+        size: DEFAULT_COLUMN_SIZE,
+        minSize: 80,
+        maxSize: 200,
+      }),
+      columnHelper.display({
+        id: 'actions',
+        header: 'Actions',
+        cell: (info) => (
+          <div className={styles.actions}>
+            <button 
+              onClick={() => handleEditApplication(info.row.original)}
+              className={styles.actionButton}
+              title="Edit"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="m18 2 4 4-12 12H6v-4z"/>
+                <path d="m21.5 6.5-4-4"/>
+              </svg>
+            </button>
+            <button 
+              onClick={() => handleDeleteApplication(info.row.original.id)}
+              className={styles.actionButton}
+              title="Delete"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polyline points="3,6 5,6 21,6"/>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                <line x1="10" y1="11" x2="10" y2="17"/>
+                <line x1="14" y1="11" x2="14" y2="17"/>
+              </svg>
+            </button>
+          </div>
+        ),
+        size: 120,
+        minSize: 80,
+        maxSize: 150,
+        enableResizing: false, // Disable resizing for actions column
+      }),
+    ],
+    []
+  );
+
+  const filteredData = useMemo(() => {
     return applications.filter(app => {
       const matchesSearch = 
         app.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -60,6 +270,20 @@ export default function ApplicationsTable() {
       return matchesSearch;
     });
   }, [applications, searchTerm]);
+
+  const table = useReactTable({
+    data: filteredData,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    columnResizeMode: 'onChange',
+    enableColumnResizing: true,
+    state: {
+      globalFilter,
+    },
+    onGlobalFilterChange: setGlobalFilter,
+  });
 
   const getStatusBadgeClass = (status: string) => {
     switch (status) {
@@ -212,159 +436,80 @@ export default function ApplicationsTable() {
       ) : (
         <>
           <div className={styles.tableContainer}>
-            <table className={styles.table}>
-              <thead className={styles.tableHeader}>
-                <tr>
-                  <th>Company</th>
-                  <th>Position</th>
-                  <th>Location</th>
-                  <th>Company Size</th>
-                  <th>Type</th>
-                  <th>Status</th>
-                  <th>Referral</th>
-                  <th>Contact</th>
-                  <th>Applied</th>
-                  <th>Response</th>
-                  <th>Salary</th>
-                  <th>Files</th>
-                  <th>Posting</th>
-                  <th>Languages</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredApplications.map((app) => (
-                  <tr key={app.id} className={styles.tableRow}>
-                    <td className={styles.tableCell}>
-                      <div className={styles.company}>{app.company}</div>
-                    </td>
-                    
-                    <td className={styles.tableCell}>
-                      <div className={styles.position}>{app.position}</div>
-                      {app.level && <div className={styles.level}>{app.level}</div>}
-                    </td>
-                    
-                    <td className={styles.tableCell}>
-                      <span className={styles.contactInfo}>{app.city}</span>
-                    </td>
-                    
-                    <td className={styles.tableCell}>
-                      <span className={styles.contactInfo}>{app.company_size}</span>
-                    </td>
-                    
-                    <td className={styles.tableCell}>
-                      <span className={styles.typeBadge}>{app.type}</span>
-                    </td>
-                    
-                    <td className={styles.tableCell}>
-                      <span className={getStatusBadgeClass(app.stage)}>
-                        {app.stage}
-                      </span>
-                    </td>
-                    
-                    <td className={styles.tableCell}>
-                      {app.referral ? (
-                        <svg className={styles.referralIcon} viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      ) : (
-                        <span className={styles.noReferral}>No</span>
-                      )}
-                    </td>
-                    
-                    <td className={styles.tableCell}>
-                      <span className={styles.contactInfo}>{app.contact || '-'}</span>
-                    </td>
-                    
-                    <td className={styles.tableCell}>
-                      <span className={styles.dateInfo}>{formatDate(app.apply_date)}</span>
-                    </td>
-                    
-                    <td className={styles.tableCell}>
-                      <span className={styles.dateInfo}>{formatDate(app.response_date)}</span>
-                    </td>
-                    
-                    <td className={styles.tableCell}>
-                      {app.salary_range && (
-                        <span className={styles.salaryRange}>{app.salary_range}</span>
-                      )}
-                    </td>
-                    
-                    <td className={styles.tableCell}>
-                      <div className={styles.filesCell}>
-                        {app.files.length > 0 ? (
-                          app.files.slice(0, 2).map((file, index) => (
-                            <span key={index} className={styles.fileLink}>
-                              📄 {file.split('/').pop()}
-                            </span>
-                          ))
-                        ) : (
-                          <span className={styles.noReferral}>-</span>
-                        )}
-                        {app.files.length > 2 && (
-                          <span className={styles.noReferral}>+{app.files.length - 2}</span>
-                        )}
-                      </div>
-                    </td>
-                    
-                    <td className={styles.tableCell}>
-                      <a 
-                        href={app.posting_url.startsWith('http') ? app.posting_url : `https://${app.posting_url}`} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className={styles.urlLink}
-                        title={app.posting_url}
-                      >
-                        {formatUrl(app.posting_url)}
-                      </a>
-                    </td>
-                    
-                    <td className={styles.tableCell}>
-                      <div className={styles.languageTags}>
-                        {app.languages.slice(0, 3).map((lang, index) => (
-                          <span key={index} className={styles.languageTag}>
-                            {lang}
-                          </span>
-                        ))}
-                        {app.languages.length > 3 && (
-                          <span className={styles.languageTag}>+{app.languages.length - 3}</span>
-                        )}
-                      </div>
-                    </td>
-                    
-                    <td className={styles.tableCell}>
-                      <div className={styles.actions}>
-                        <button 
-                          onClick={() => handleEditApplication(app)}
-                          className={styles.actionButton}
-                          title="Edit"
+            <div className={styles.tableWrapper}>
+              <table className={styles.table} style={{ width: table.getCenterTotalSize() }}>
+                <thead className={styles.tableHeader}>
+                  {table.getHeaderGroups().map(headerGroup => (
+                    <tr key={headerGroup.id}>
+                      {headerGroup.headers.map((header, index) => (
+                        <th
+                          key={header.id}
+                          className={styles.tableHeaderCell}
+                          style={{
+                            width: header.getSize(),
+                          }}
                         >
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="m18 2 4 4-12 12H6v-4z"/>
-                            <path d="m21.5 6.5-4-4"/>
-                          </svg>
-                        </button>
-                        <button 
-                          onClick={() => handleDeleteApplication(app.id)}
-                          className={styles.actionButton}
-                          title="Delete"
+                          <div className={styles.headerContent}>
+                            <div
+                              className={styles.headerText}
+                              onClick={header.column.getToggleSortingHandler()}
+                              style={{ cursor: header.column.getCanSort() ? 'pointer' : 'default' }}
+                            >
+                              {flexRender(header.column.columnDef.header, header.getContext())}
+                              {{
+                                asc: ' ↑',
+                                desc: ' ↓',
+                              }[header.column.getIsSorted() as string] ?? null}
+                            </div>
+                          </div>
+                          
+                          {/* Notion-style column divider/resizer */}
+                          {index < headerGroup.headers.length - 1 && header.column.getCanResize() && (
+                            <div className={styles.columnDivider}>
+                              <div 
+                                className={`${styles.dividerLine} ${header.column.getIsResizing() ? styles.dividerResizing : ''}`}
+                              />
+                              <div
+                                className={`${styles.resizeHandle} ${header.column.getIsResizing() ? styles.resizeHandleActive : ''}`}
+                                onMouseDown={header.getResizeHandler()}
+                                onTouchStart={header.getResizeHandler()}
+                              />
+                            </div>
+                          )}
+                        </th>
+                      ))}
+                    </tr>
+                  ))}
+                </thead>
+                <tbody>
+                  {table.getRowModel().rows.map(row => (
+                    <tr key={row.id} className={styles.tableRow}>
+                      {row.getVisibleCells().map((cell, index) => (
+                        <td
+                          key={cell.id}
+                          className={styles.tableCell}
+                          style={{
+                            width: cell.column.getSize(),
+                          }}
                         >
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <polyline points="3,6 5,6 21,6"/>
-                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-                            <line x1="10" y1="11" x2="10" y2="17"/>
-                            <line x1="14" y1="11" x2="14" y2="17"/>
-                          </svg>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                          <div className={styles.cellContent}>
+                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                          </div>
+                          
+                          {/* Cell divider */}
+                          {index < row.getVisibleCells().length - 1 && (
+                            <div className={styles.cellDivider} />
+                          )}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
 
-          {filteredApplications.length === 0 && !loading && (
+          {filteredData.length === 0 && !loading && (
             <div className={styles.emptyState}>
               <h3 className={styles.emptyTitle}>
                 {searchTerm || statusFilter !== 'all' || typeFilter !== 'all' 

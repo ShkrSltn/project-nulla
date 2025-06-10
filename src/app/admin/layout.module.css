@@ -1,19 +1,27 @@
 .dashboardLayout {
-    display: flex;
-    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 15% 85%;
+    height: 100vh;
     background: #f8fafc;
+    overflow: hidden;
 }
 
 .dashboardMain {
-    margin-left: 280px;
-    flex: 1;
     background: #f8fafc;
-    transition: margin-left 0.3s ease;
-    min-height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: 100vh;
 }
 
 @media (max-width: 768px) {
+    .dashboardLayout {
+        grid-template-columns: 1fr;
+        overflow: visible;
+    }
+
     .dashboardMain {
-        margin-left: 0;
+        overflow: visible;
+        height: auto;
+        min-height: 100vh;
     }
 }
